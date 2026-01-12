@@ -1,37 +1,43 @@
-import { useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 import './App.css';
 import ProductItem from './components/ProductItem';
 import ShoppingCartProduct from './components/ShoppingCartProduct';
-import { reducerCart, productsInitialState } from './reducers/shoppingCart_reducer';
-import TYPES from './reducers/actionTypes';
+import { useStore } from './components/store/store';
 
 function App() {
 
-  const [state, dispatch] = useReducer(reducerCart, productsInitialState);
+  //const [state, dispatch] = useReducer(reducerCart, productsInitialState);
 
-  const addToCart = (id) => {
-    dispatch({
-      type: TYPES.ADD_TO_CART,
-      payload: id
-    })
-  }
+  const { products, cart, totalPriceShoppingCart, addToCart, deleteFromCart, clearCart, calculateTotalPriceOfCart } = useStore();
 
-  const deleteFromCart = (id) => {
-    dispatch({
-      type: TYPES.DELETE_PRODUCT_FROM_CART,
-      payload: id
-    })
-  }
+  useEffect(() => {
+    console.log('carrito: ', cart)
+    calculateTotalPriceOfCart()
+  }, [cart, calculateTotalPriceOfCart])
 
-  const clearCart = () => {
-    dispatch({
-      type: TYPES.DELETE_ALL_FROM_CART
-    })
-  }
+  // const addToCart = (id) => {
+  //   dispatch({
+  //     type: TYPES.ADD_TO_CART,
+  //     payload: id
+  //   })
+  // }
 
-  const calculateTotalPriceOfCart = () => {
-    dispatch({ type: TYPES.CALCULATE_TOTAL_PRICE_OF_THE_CART })
-  }
+  // const deleteFromCart = (id) => {
+  //   dispatch({
+  //     type: TYPES.DELETE_PRODUCT_FROM_CART,
+  //     payload: id 
+  //   })
+  // }
+
+  // const clearCart = () => {
+  //   dispatch({
+  //     type: TYPES.DELETE_ALL_FROM_CART
+  //   })
+  // }
+
+  // const calculateTotalPriceOfCart = () => {
+  //   dispatch({ type: TYPES.CALCULATE_TOTAL_PRICE_OF_THE_CART })
+  // }
 
 
   return (
@@ -41,7 +47,7 @@ function App() {
       <h2 className='subtitle_products'>Products in Stock</h2>
       <div className='container_grid_products'>
         {
-          state.products.map((product) => {
+          products.map((product) => {
             return <ProductItem key={product.id} data={product} addToCart={addToCart} />
           })
         }
@@ -51,18 +57,18 @@ function App() {
       <h2 className='subtitle_shopping_cart'>Shopping Cart</h2>
       <div className='container_buttons'>
         <button className='btn btn_totalPrice' onClick={() => calculateTotalPriceOfCart()}>Total Price</button>
-        {state.totalPriceShoppingCart > 0 && <p className='totalPrice_shoppingCart'>Total Price: {state.totalPriceShoppingCart}</p>}
+        {totalPriceShoppingCart > 0 && <p className='totalPrice_shoppingCart'>Total Price: {totalPriceShoppingCart}</p>}
         <button className='btn btn_ClearCart' onClick={() => clearCart()}>Clear cart</button>
       </div>
       {
-        state.cart.length === 0 && <p className='text_NoProductsInCart'>There are no products in the cart</p>
+        cart.length === 0 && <p className='text_NoProductsInCart'>There are no products in the cart</p>
       }
 
       <div className='container_grid_shopping_cart'>
 
 
         {
-          state.cart.map((productCart) => {
+          cart.map((productCart) => {
             return <ShoppingCartProduct key={productCart.id + (Math.random() * 50)} data={productCart} deleteFromCart={deleteFromCart} />
           })
         }
